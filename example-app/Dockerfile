@@ -7,22 +7,28 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 COPY .docker/vhost.conf /etc/apache2/sites-available/000-default.conf
 
+# Copiar o arquivo de configuração do phpMyAdmin e renomeá-lo
+COPY .docker/config.inc.template.php /var/www/html/config.inc.php
+
 # Atualizar e instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
-libpng-dev libjpeg-dev libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
     && docker-php-ext-install mysqli pdo pdo_mysql
 
+# Definir o ServerName para evitar o aviso do Apache
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
 # Limpar o cache do APT
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configurar permissões corretas para Laravel
+# Configurar permissões corretas para Laravel e phpMyAdmin
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/config.inc.php \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Configurar o nome do servidor para evitar aviso do Apache
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 # Habilitar mod_rewrite para Laravel
 RUN a2enmod rewrite

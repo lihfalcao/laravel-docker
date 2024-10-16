@@ -152,6 +152,8 @@ DB_PASSWORD=userpassword
 
 ### 9.autoload.php
 
+https://drive.google.com/file/d/1CXoaJOn6VrKvvDVfcDRVEUyo4HLmtdkU/view?usp=sharing
+
 Criar o arquivo autoload.php na vendor
 
 ```bash
